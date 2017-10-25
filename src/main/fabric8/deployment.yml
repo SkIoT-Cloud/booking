@@ -1,0 +1,45 @@
+spec:
+  template:
+    spec:
+      containers:
+        -
+          volumeMounts:
+            -
+              name: config
+              mountPath: /app/config
+          env:
+            -
+              name: JAVA_OPTIONS
+              value: "-Dswarm.project.stage.file=file:///app/config/project-defaults.yml"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            failureThreshold: 2
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 500Mi
+      volumes:
+        -
+          configMap:
+            name: app-config
+          name: config
